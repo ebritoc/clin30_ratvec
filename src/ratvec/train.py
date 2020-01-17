@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # TODO expand to multiple by having a nested dictionary from name of parameter to list of possibilities for grid search
 #: A dictionary from kernel functions to their *single* hyper-parameter over which to run a grid search
 kernels = {
-    "rbf": [0.5]
+    "rbf": [0.8]
 }
 
 ALLOWED_SIMILARITIES = [
