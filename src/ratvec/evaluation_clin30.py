@@ -12,8 +12,8 @@ import numpy as np
 from tqdm import tqdm
 
 from ratvec.constants import EMOJI
-from ratvec.eval_utils import mean_cross_val_score
-from ratvec.utils import make_balanced, make_ratvec, secho
+from ratvec.eval_utils import mean_cross_val_score, score_overview
+from ratvec.utils import  make_ratvec, secho
 
 __all__ = [
     'main',
@@ -116,15 +116,16 @@ def _sub_run_evaluation(
     for reduced_n_components in it:
         n_neighbors = 1
         partial_eval_function = partial(
-            mean_cross_val_score,
+            score_overview,
             reduced_n_components,
             n_neighbors,
         )
-        plos_scores = np.array(pool.starmap(partial_eval_function, balanced_datasets))
-        weighted_score = np.dot(plos_scores, filt_counts) / np.sum(filt_counts)
 
-        it.write(f"{reduced_n_components}\t{weighted_score:.3f}")
-        number_components_grid_search_results[reduced_n_components] = weighted_score
+        best_mean_score,_,_ = np.array(pool.starmap(partial_eval_function, balanced_datasets))[0]
+
+
+        it.write(f"{reduced_n_components}\t{best_mean_score:.3f}")
+        number_components_grid_search_results[reduced_n_components] = best_mean_score
 
     best_number_components = max(
         number_components_grid_search_results,
@@ -139,19 +140,30 @@ def _sub_run_evaluation(
     it = tqdm(range(1, max_neighbors), desc=f'{EMOJI} Optimizing number of neighbors')
     for n_neighbors in it:
         partial_eval_function = partial(
-            mean_cross_val_score,
+            score_overview,
             best_number_components,
             n_neighbors,
         )
-        plos_scores = np.array(pool.starmap(partial_eval_function, balanced_datasets))
-        weighted_score = np.dot(plos_scores, filt_counts) / np.sum(filt_counts)
+        best_mean_score,_,_= np.array(pool.starmap(partial_eval_function, balanced_datasets))[0]
 
-        it.write(f"{n_neighbors}\t{weighted_score:.3f}\b")
-        number_neighbors_grid_search_results[n_neighbors] = weighted_score
+
+        it.write(f"{n_neighbors}\t{best_mean_score:.3f}\b")
+        number_neighbors_grid_search_results[n_neighbors] = best_mean_score
 
     best_number_neighbors = max(number_neighbors_grid_search_results, key=number_neighbors_grid_search_results.get)
     best_result2 = number_neighbors_grid_search_results[best_number_neighbors]
     secho(f"Best at neighbors={best_number_neighbors}, score={best_result2:.3f}")
+
+    mean_score, pos_score, neg_score = score_overview(
+        best_number_components,
+        best_number_neighbors,
+        balanced_datasets[0][0],
+        balanced_datasets[0][1])
+    secho(f"10-fold-crossvalidation accuracy on positive examples={pos_score:.3f}")
+    secho(f"10-fold-crossvalidation accuracy on negative examples={neg_score:.3f}")
+    secho(f"Overall 10-fold-crossvalidation accuracy {mean_score:.3f}")
+
+
 
     with open(os.path.join(subdirectory, 'evaluation_results.json'), 'w') as file:
         json.dump(
