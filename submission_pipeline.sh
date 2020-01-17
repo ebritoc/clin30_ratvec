@@ -8,10 +8,10 @@ python translation_preprocessing $1 $2
 git clone https://github.com/eriktks/clin2017st.git
 cd clin2017st
 make
-bin/tokenize < clin30/positive_stripped.txt > pos.tok
-bin/tokenize < clin30/negative.txt > neg.tok
-bin/translate -l lexicon.txt < pos.tok > pos.translated.tok
-bin/translate -l lexicon.txt < neg.tok > neg.translated.tok
+bin/tokenize < ../data/positive_stripped.txt > pos.tok
+bin/tokenize < ../data/negative.txt > neg.tok
+bin/translate -l lexicon.txt < pos.tok > ../data/pos.translated.tok
+bin/translate -l lexicon.txt < neg.tok > ../data/neg.translated.tok
 cd ..
 
 python generate_POS_sequences.py
