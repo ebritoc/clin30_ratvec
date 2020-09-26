@@ -16,6 +16,6 @@ cd ..
 
 python ./src/generate_POS_sequences.py
 
-cat ./data/parsed/positive_pos_coarse.txt ./data/parsed/positive_neg_coarse.txt > ./data/parsed/all_pos_coarse.txt
+cat ./data/parsed/positive_pos_coarse.txt ./data/parsed/negative_pos_coarse.txt > ./data/parsed/all_pos_coarse.txt
 ratvec train -s " " -f ./data/parsed/all_pos_coarse.txt  -r ./data/CGN/POS_coarse_sequences3000.txt  -d ./output/2-spectrum/3000 --sim p_spectrum --n-ngram 2 &
 ratvec evaluate_clin30 -d ./output/2-spectrum/3000 -n 100 &
