@@ -4,7 +4,7 @@
 
 You can reproduce our submitted results by executing the provided bash script following the format specified in the shared task instructions:
 ```bash
-bash submission_pipeline.sh positive stripped.csv negative.csv
+bash submission_pipeline.sh positive_stripped.csv negative.csv
 ```
 
 However, the whole pipeline may take a while since it involves the installation of several third-party tools. You can also use the provided preprocessed data and execute just the three last lines of the script:
